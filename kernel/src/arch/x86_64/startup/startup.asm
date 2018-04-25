@@ -55,16 +55,10 @@ _start:
   .cpycmdline:
     lodsb
     test al, al
-    db 0x75, 0x0b   ; jnz
-    add esp, 4
-    mov dword [esp], .cpycmdline_out - kernel_phys_offset
-    ret
+    jz .cpycmdline_out - kernel_phys_offset
     stosb
     dec ecx
-    db 0x75, 0x0b   ; jnz
-    add esp, 4
-    mov dword [esp], .cpycmdline - kernel_phys_offset
-    ret
+    jz .cpycmdline - kernel_phys_offset
   .cpycmdline_out:
     xor al, al
     stosb

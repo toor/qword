@@ -9,7 +9,7 @@ section .multiboot
 
 bits 32
 legacy_skip_header:
-    jmp _start
+    jmp _start - kernel_phys_offset
 
 align 4
 

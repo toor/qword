@@ -33,10 +33,7 @@ check_cpuid:
     popfd
 
     cmp eax, ecx
-    db 0x75, 0x0b   ; jne
-    add esp, 4
-    mov dword [esp], .no_cpuid - kernel_phys_offset
-    ret
+    je .no_cpuid - kernel_phys_offset
     ret
 .no_cpuid:
     mov esi, .msg - kernel_phys_offset
@@ -52,18 +49,12 @@ check_long_mode:
     mov eax, 0x80000000
     cpuid
     cmp eax, 0x80000001
-    db 0x73, 0x0b   ; jnb
-    add esp, 4
-    mov dword [esp], .no_long_mode - kernel_phys_offset
-    ret
+    jb .no_long_mode - kernel_phys_offset
 
     mov eax, 0x80000001
     cpuid
     test edx, 1 << 29 ; Check if the LM bit is set in the D register
-    db 0x75, 0x0b   ; jnz
-    add esp, 4
-    mov dword [esp], .no_long_mode - kernel_phys_offset
-    ret
+    jz .no_long_mode - kernel_phys_offset
     ret
 .no_long_mode:
     mov esi, .no_lm_msg - kernel_phys_offset

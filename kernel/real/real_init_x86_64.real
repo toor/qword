@@ -13,9 +13,6 @@ sidt [lmode_idt]
 ; Load real mode IDT
 lidt [real_idt]
 
-; Save lmode GDT
-sgdt [lmode_gdt]
-
 ; save cr3
 mov rax, cr3
 mov dword [cr3_reg], eax
@@ -76,9 +73,6 @@ rdmsr
 or eax, 0x00000100
 wrmsr
 
-; load long mode GDT
-lgdt [lmode_gdt]
-
 ; Enter long mode
 mov eax, cr0
 or eax, 0x80000001
@@ -114,11 +108,6 @@ lmode_idt:
 align 4
 real_idt:
     dw 0x3FF
-    dq 0
-
-align 4
-lmode_gdt:
-    dw 0
     dq 0
 
 arg dd 0
