@@ -6,6 +6,7 @@
 #include <panic.h>
 #include <smp.h>
 #include <time.h>
+#include <mm.h>
 
 #define MAX_CPUS 128
 #define CPU_STACK_SIZE (8192+8192)
@@ -28,7 +29,7 @@ int smp_cpu_count = 1;
     } __attribute__((packed)) tss_t;
 #endif
 
-static size_t cpu_stack_top = 0xeffff0;
+static size_t cpu_stack_top = 0xffffffffc0effff0;
 
 static cpu_local_t cpu_locals[MAX_CPUS];
 static tss_t cpu_tss[MAX_CPUS] __attribute__((aligned(16)));
@@ -37,13 +38,11 @@ static void ap_kernel_entry(void) {
     /* APs jump here after initialisation */
 
     kprint(KPRN_INFO, "smp: Started up AP #%u", smp_get_cpu_number());
-    kprint(KPRN_INFO, "smp: AP #%u kernel stack top: %x", smp_get_cpu_number(), smp_get_cpu_kernel_stack());
+    kprint(KPRN_INFO, "smp: AP #%u kernel stack top: %X", smp_get_cpu_number(), smp_get_cpu_kernel_stack());
 
     /* halt and catch fire */
     for (;;) { asm volatile ("cli; hlt"); }
 }
-
-extern void *kernel_pagemap;
 
 static int start_ap(uint8_t target_apic_id, int cpu_number) {
     if (cpu_number == MAX_CPUS) {
@@ -64,7 +63,7 @@ static int start_ap(uint8_t target_apic_id, int cpu_number) {
         tss->ss = 0x08;
     #endif
 
-    void *trampoline = smp_prepare_trampoline(ap_kernel_entry, &kernel_pagemap,
+    void *trampoline = smp_prepare_trampoline(ap_kernel_entry, (void *)((size_t)&kernel_pagemap - KERNEL_PHYS_OFFSET),
                                 (void *)cpu_stack_top, cpu_local, tss);
 
     /* Send the INIT IPI */

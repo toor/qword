@@ -94,7 +94,11 @@ align 16
     db 00000000b
   .tss_high:
     db 0
-    dq 0                ; res
+  .tss_upper32:
+    dd 0
+  .tss_reserved:
+    dd 0
+
 .gdt_end:
 
 load_tss:
@@ -112,6 +116,10 @@ load_tss:
     shr eax, 24
     mov rbx, gdt_ptr.tss_high
     mov byte [rbx], al
+    mov rax, rdi
+    shr rax, 32
+    mov rbx, gdt_ptr.tss_upper32
+    mov dword [rbx], eax
     mov rbx, gdt_ptr.tss_flags1
     mov byte [rbx], 10001001b
     mov rbx, gdt_ptr.tss_flags2
