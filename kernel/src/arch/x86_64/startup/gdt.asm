@@ -103,6 +103,7 @@ align 16
 
 load_tss:
     ; addr in RDI
+    push rbx
     mov eax, edi
     mov rbx, gdt_ptr.tss_low
     mov word [rbx], ax
@@ -124,4 +125,5 @@ load_tss:
     mov byte [rbx], 10001001b
     mov rbx, gdt_ptr.tss_flags2
     mov byte [rbx], 0
+    pop rbx
     ret

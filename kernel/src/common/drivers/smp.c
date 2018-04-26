@@ -16,8 +16,8 @@ int smp_cpu_count = 1;
 #ifdef __X86_64__
     typedef struct {
         uint32_t unused __attribute__((aligned(16)));
-        uint32_t sp;
-        uint32_t entries[24];
+        uint64_t sp;
+        uint32_t entries[23];
     } __attribute__((packed)) tss_t;
 #endif
 #ifdef __I386__
@@ -29,7 +29,9 @@ int smp_cpu_count = 1;
     } __attribute__((packed)) tss_t;
 #endif
 
-static size_t cpu_stack_top = 0xffffffffc0effff0;
+#ifdef __X86_64__
+    static size_t cpu_stack_top = 0xffffffffc0effff0;
+#endif
 
 static cpu_local_t cpu_locals[MAX_CPUS];
 static tss_t cpu_tss[MAX_CPUS] __attribute__((aligned(16)));
@@ -58,8 +60,11 @@ static int start_ap(uint8_t target_apic_id, int cpu_number) {
     /* prepare TSS */
     tss_t *tss = &cpu_tss[cpu_number];
 
-    tss->sp = (uint32_t)cpu_stack_top;
+    #ifdef __X86_64__
+        tss->sp = (uint64_t)cpu_stack_top;
+    #endif
     #ifdef __I386__
+        tss->sp = (uint32_t)cpu_stack_top;
         tss->ss = 0x08;
     #endif
 
@@ -104,8 +109,11 @@ static void init_cpu0(void) {
 
     tss_t *tss = &cpu_tss[0];
 
-    tss->sp = (uint32_t)cpu_stack_top;
+    #ifdef __X86_64__
+        tss->sp = (uint64_t)cpu_stack_top;
+    #endif
     #ifdef __I386__
+        tss->sp = (uint32_t)cpu_stack_top;
         tss->ss = 0x08;
     #endif
 
