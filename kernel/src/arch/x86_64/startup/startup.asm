@@ -55,10 +55,10 @@ _start:
   .cpycmdline:
     lodsb
     test al, al
-    jz .cpycmdline_out - kernel_phys_offset
+    jz near .cpycmdline_out
     stosb
     dec ecx
-    jz .cpycmdline - kernel_phys_offset
+    jnz near .cpycmdline
   .cpycmdline_out:
     xor al, al
     stosb

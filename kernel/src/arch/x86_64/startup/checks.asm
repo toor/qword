@@ -33,7 +33,7 @@ check_cpuid:
     popfd
 
     cmp eax, ecx
-    je .no_cpuid - kernel_phys_offset
+    je near .no_cpuid
     ret
 .no_cpuid:
     mov esi, .msg - kernel_phys_offset
@@ -41,7 +41,7 @@ check_cpuid:
 .halt:
     cli
     hlt
-    jmp .halt - kernel_phys_offset
+    jmp near .halt
 
 .msg db "CPUID not supported", 0
 
@@ -49,12 +49,12 @@ check_long_mode:
     mov eax, 0x80000000
     cpuid
     cmp eax, 0x80000001
-    jb .no_long_mode - kernel_phys_offset
+    jb near .no_long_mode
 
     mov eax, 0x80000001
     cpuid
     test edx, 1 << 29 ; Check if the LM bit is set in the D register
-    jz .no_long_mode - kernel_phys_offset
+    jz near .no_long_mode
     ret
 .no_long_mode:
     mov esi, .no_lm_msg - kernel_phys_offset
@@ -62,5 +62,5 @@ check_long_mode:
 .halt:
     cli
     hlt
-    jmp .halt - kernel_phys_offset
+    jmp near .halt
 .no_lm_msg db "Long mode not available, system halted", 0

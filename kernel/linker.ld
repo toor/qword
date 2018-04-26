@@ -7,26 +7,25 @@ SECTIONS
 
     .text ALIGN(4K) :
     {
-        kernel_phys_offset = 0xffffffffc0000000;
-        sections_text = (. - kernel_phys_offset);
+        sections_text = . - 0xffffffffc0000000;
         KEEP(*(.multiboot))
         *(.text)
-        sections_text_end = (. - kernel_phys_offset);
+        sections_text_end = . - 0xffffffffc0000000;
     }
 
     .data ALIGN(4K) :
     {
-        sections_data = (. - kernel_phys_offset);
+        sections_data = . - 0xffffffffc0000000;
         *(.data)
         *(.rodata)
-        sections_data_end = (. - kernel_phys_offset);
+        sections_data_end = . - 0xffffffffc0000000;
     }
 
     .bss ALIGN(4K) :
     {
-        sections_bss = (. - kernel_phys_offset);
+        sections_bss = . - 0xffffffffc0000000;
         *(COMMON)
         *(.bss)
-        sections_bss_end = (. - kernel_phys_offset);
+        sections_bss_end = . - 0xffffffffc0000000;
     }
 }
